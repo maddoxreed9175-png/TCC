@@ -1,2 +1,2 @@
 # TCC
-Time Complexity in Clang
+Time Complexity Calculator

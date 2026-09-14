@@ -1,0 +1,36 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "local",
+      "hidden": true,
+      "toolchainFile": "C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "Clang_DIR": "C:/path/to/llvm/lib/cmake/clang",
+        "LLVM_DIR": "C:/path/to/llvm/lib/cmake/llvm",
+        "CMAKE_C_COMPILER": "C:/path/to/llvm/bin/clang.exe",
+        "CMAKE_CXX_COMPILER": "C:/path/to/llvm/bin/clang++.exe"
+      }
+    },
+    {
+      "name": "dev-release",
+      "displayName": "Dev Release",
+      "inherits": ["local", "clang-release"]
+    },
+    {
+      "name": "dev-relwithdebinfo",
+      "displayName": "Dev RelWithDebInfo",
+      "inherits": ["local", "clang-relwithdebinfo"]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev-release",
+      "configurePreset": "dev-release"
+    },
+    {
+      "name": "dev-relwithdebinfo",
+      "configurePreset": "dev-relwithdebinfo"
+    }
+  ]
+}

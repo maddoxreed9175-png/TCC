@@ -51,6 +51,7 @@ cmake_install.cmake
 Makefile
 install_manifest.txt
 compile_commands.json
+CMakeUserPresets.json
 
 # Temporary files
 *.tmp
@@ -67,3 +68,10 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# IDEs
+.idea/
+.zed/
+
+# Generated Files
+output.txt

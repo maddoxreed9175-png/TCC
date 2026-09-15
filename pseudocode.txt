@@ -38,10 +38,16 @@ TCC(measured_vars, start_line, end_line, visited_start_lines, loop_inc_num=1){
                 complexity.append TCC(measured_vars[var], current_line, new_end_line, calculate_loop_increment)
                 move current line to end of function
             }elif current_line is assignment && includes var{
-                
+                //This part is temporary, I'd like to talk to everyone about solutions
+                //loop_inc_num may need to be changed
+                //a constant C may need to be set
             }
         }
     }
 
-    return (for (int i=0; i<complexity.length(); i++) std::cout << loop_inc_num*complexity[i] << std::endl);
+    for (int i=0; i<complexity.length(); i++){
+        std::cout << loop_inc_num*complexity[i] << std::endl;
+    }
+
+    return 0;
 }

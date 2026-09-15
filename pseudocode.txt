@@ -1,0 +1,47 @@
+//pseudo-code for TCC
+
+/*
+measured_vars = list of all variables that are inputs passed into the function
+start_line = the line number of the first line of the function (function declaration)
+end_line = the line number of the last line of the function (closing bracket)
+visited_start_lines = list of all functions visited based on line number
+    This allows us to detect recursive functions
+loop_inc_num = the number of times the function increments
+    eg. for(int i=0; i < 10; i++){} would have a loop_inc_num of 10
+    Note: For basic functions, loop_inc_num is 1 because the function only runs once
+*/
+
+//NOTE: I haven't figured out a way to deal with recursion yet, this code will most likely change if we do
+//NOTE: For this function to work, each sub function can only return 1 variable.
+      //This currently works, but we need to make sure subfunctions always return 1 variable
+
+
+TCC(measured_vars, start_line, end_line, visited_start_lines, loop_inc_num=1){
+    
+    //Add current start_line to the list of visited lines
+    visited_start_lines.append start_line
+
+    //Empty list, each element will be a component of the final time complexity
+    complexity = {}
+
+    //This loops for each variable we want the time complexity of
+    for (int var=0; var<measured_vars.length(); var++){
+
+        //This loops through each line of the function
+        for (current_line = start_line+1; current_line<end_line; current_line++){
+
+            //This line makes sure a nested function is not recursive
+            if current_line starts function && includes var && current_line is not in visited_start_lines{
+                complexity.append TCC(measured_vars[var], current_line, new_end_line, 1)
+                move current line to end of function
+            }elif current_line starts loop && includes var{
+                complexity.append TCC(measured_vars[var], current_line, new_end_line, calculate_loop_increment)
+                move current line to end of function
+            }elif current_line is assignment && includes var{
+                
+            }
+        }
+    }
+
+    return (for (int i=0; i<complexity.length(); i++) std::cout << loop_inc_num*complexity[i] << std::endl);
+}

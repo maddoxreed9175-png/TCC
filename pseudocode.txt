@@ -1,6 +1,15 @@
 //pseudo-code for TCC
 
 /*
+Current Main Issues:
+    Handling variable assignment
+    Cases we need solutions for:
+    - When a number is assigned to a measured variable
+    - When a measured variable is changed using an operator
+    - When a measured variable is used in the assignment of a different variable
+*/
+
+/*
 measured_vars = list of all variables that are inputs passed into the function
 start_line = the line number of the first line of the function (function declaration)
 end_line = the line number of the last line of the function (closing bracket)
@@ -11,7 +20,7 @@ loop_inc_num = the number of times the function increments
     Note: For basic functions, loop_inc_num is 1 because the function only runs once
 */
 
-//NOTE: I haven't figured out a way to deal with recursion yet, this code will most likely change if we do
+//NOTE: We have a very basic idea of how to deal with recursion that needs to be refined
 //NOTE: For this function to work, each sub function can only return 1 variable.
       //This currently works, but we need to make sure subfunctions always return 1 variable
 
@@ -30,10 +39,15 @@ TCC(measured_vars, start_line, end_line, visited_start_lines, loop_inc_num=1){
         //This loops through each line of the function
         for (current_line = start_line+1; current_line<end_line; current_line++){
 
-            //This line makes sure a nested function is not recursive
             if current_line starts function && includes var && current_line is not in visited_start_lines{
-                complexity.append TCC(measured_vars[var], current_line, new_end_line, 1)
-                move current line to end of function
+                //This line checks to see if a nested function is recursive
+                if current_line is not in visited_start_lines {
+                    complexity.append TCC(measured_vars[var], current_line, new_end_line, 1)
+                }else{
+                    //If a nested function is recursive, we need to recalculate the current loop_inc_num
+                    //This should be done based on the change in the current var as it is passed in
+                    recalculate loop_inc_num
+                }
             }elif current_line starts loop && includes var{
                 complexity.append TCC(measured_vars[var], current_line, new_end_line, calculate_loop_increment)
                 move current line to end of function
@@ -45,9 +59,14 @@ TCC(measured_vars, start_line, end_line, visited_start_lines, loop_inc_num=1){
         }
     }
 
-    for (int i=0; i<complexity.length(); i++){
-        std::cout << loop_inc_num*complexity[i] << std::endl;
+    //This will most likely output a string
+    //ex. if complexity[i] == n and loop_inc_num == n, loop_inc_num*complexity[i] = n*n
+    if measured_vars.length() <= 1 {
+        return loop_inc_num + "*" + complexity[i]
+    }else{
+        for (int i=0; i<complexity.length(); i++){
+            std::cout << loop_inc_num*complexity[i] << std::endl;
+        }
+        return 0;
     }
-
-    return 0;
 }

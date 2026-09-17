@@ -35,7 +35,7 @@ Close and reopen PowerShell so the PATH changes take effect, then check:
 
 ```powershell
 git --version
-cmake --version   # must be 3.25 or newer
+cmake --version # must be 3.25 or newer
 ninja --version
 ```
 

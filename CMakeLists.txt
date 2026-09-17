@@ -4,7 +4,12 @@ project(TCC)
 # Pulls in whatever Clang/LLVM dev files are installed on this machine
 find_package(Clang REQUIRED CONFIG)
 
-add_executable(tcc main.cpp)
+add_executable(tcc
+    src/main.cpp
+    src/ASTWalker.cpp
+    src/TCCASTConsumer.cpp
+    src/TCC.cpp
+)
 
 target_include_directories(tcc PRIVATE
     ${CLANG_INCLUDE_DIRS}

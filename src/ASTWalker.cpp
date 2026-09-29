@@ -16,53 +16,91 @@ bool ASTWalker::VisitFunctionDecl(FunctionDecl *FD) {
   if (!Context->getSourceManager().isInMainFile(FD->getLocation()))
     return true;
 
-  unsigned Depth = maxLoopDepth(FD->getBody());
-  std::cout << FD->getNameAsString() << ": max loop nesting depth = " << Depth
-            << "\n";
+  // === CODE === //
+  std::vector<ForLoop> Loops = gatherForLoopPieces(FD->getBody());
+  std::cout << FD->getNameAsString() << ": " << Loops.size()
+            << " for loop(s)\n";
 
-  printForLoopPieces(FD->getBody());
+  std::cout << "First Loop:" << sourceText(Loops[0].init)
+            << sourceText(Loops[0].cond) << sourceText(Loops[0].inc)
+            << std::endl;
+  ForLoop loop = Loops[0];
+
+  // === Initializer === //
+  // int i = ?
+  if (const auto *declStmt = dyn_cast_or_null<DeclStmt>(loop.init)) {
+    for (const Decl *decl : declStmt->decls()) {
+      if (const auto *varDecl = dyn_cast<VarDecl>(decl)) {
+        std::string Name = varDecl->getNameAsString();
+        if (const Expr *initExpr = varDecl->getInit()) {
+          if (const auto *literal =
+                  dyn_cast<IntegerLiteral>(initExpr->IgnoreParenImpCasts())) {
+            int64_t Value = literal->getValue().getSExtValue();
+            std::cout << "Init value: " << Value << std::endl;
+          }
+        }
+      }
+    }
+  } else if (const auto *assignment = dyn_cast_or_null<BinaryOperator>(loop.init)) {
+      if (assignment->getOpcode() == BO_Assign) {
+          const Expr *leftSide = assignment->getLHS()->IgnoreParenImpCasts();
+          const Expr *rightSide = assignment->getRHS()->IgnoreParenImpCasts();
+
+          if (const auto *variableRef = dyn_cast<DeclRefExpr>(leftSide)) {
+              std::string name = variableRef->getDecl()->getNameAsString(); // "i"
+          }
+          if (const auto* literal = dyn_cast<IntegerLiteral>(rightSide)) {
+              int64_t value = literal->getValue().getSExtValue();
+          }
+      }
+  }
+
+  // Conditional
+  if (const auto *BO = dyn_cast_or_null<BinaryOperator>(loop.cond)) {
+    StringRef Op = BO->getOpcodeStr(); // "<"
+    const Expr *LHS = BO->getLHS()->IgnoreParenImpCasts();
+    const Expr *RHS = BO->getRHS()->IgnoreParenImpCasts();
+    if (const auto *DR = dyn_cast<DeclRefExpr>(LHS)) {
+      std::string Var = DR->getDecl()->getNameAsString(); // "i"
+      std::cout << "Cond Value: " << Var << std::endl;
+    }
+  }
+
+  // Actor
+  if (const auto *UO =
+          dyn_cast_or_null<UnaryOperator>(loop.inc)) { // i++ / ++i / i--
+    UO->getOpcode();  // UO_PostInc, UO_PreInc, UO_PostDec, UO_PreDec
+    UO->getSubExpr(); // the "i"
+    std::cout << "Inc Value: " << UO->getOpcode() << std::endl;
+  } else if (const auto *BO = dyn_cast_or_null<BinaryOperator>(loop.inc)) {
+    BO->getOpcode(); // BO_AddAssign for i += 2, BO_DivAssign for n /= 2,
+                     // BO_Assign for i = i * 2
+  }
 
   return true; // true = keep going, don't stop the traversal
 }
 
-unsigned ASTWalker::maxLoopDepth(Stmt *S) {
+std::vector<ForLoop> ASTWalker::gatherForLoopPieces(Stmt *S) {
+  std::vector<ForLoop> Loops;
   if (!S)
-    return 0;
+    return Loops;
 
-  bool IsLoop = isa<ForStmt>(S) || isa<WhileStmt>(S) || isa<DoStmt>(S) ||
-                isa<CXXForRangeStmt>(S);
+  if (const ForStmt *FS = dyn_cast<ForStmt>(S))
+    Loops.push_back({FS->getInit(), FS->getCond(), FS->getInc()});
 
-  unsigned DeepestChild = 0;
   for (Stmt *Child : S->children()) {
-    unsigned ChildDepth = maxLoopDepth(Child);
-    if (ChildDepth > DeepestChild)
-      DeepestChild = ChildDepth;
+    std::vector<ForLoop> ChildLoops = gatherForLoopPieces(Child);
+    Loops.insert(Loops.end(), ChildLoops.begin(), ChildLoops.end());
   }
 
-  return IsLoop ? DeepestChild + 1 : DeepestChild;
+  return Loops;
 }
 
 std::string ASTWalker::sourceText(const Stmt *S) {
   if (!S)
     return "(none)";
-
   CharSourceRange Range = CharSourceRange::getTokenRange(S->getSourceRange());
-  StringRef Text = Lexer::getSourceText(Range, Context->getSourceManager(),
-                                         Context->getLangOpts());
-  return Text.str();
-}
-
-void ASTWalker::printForLoopPieces(Stmt *S) {
-  if (!S)
-    return;
-
-  if (const ForStmt *FS = dyn_cast<ForStmt>(S)) {
-    std::cout << "  for loop:\n";
-    std::cout << "    init: " << sourceText(FS->getInit()) << "\n";
-    std::cout << "    cond: " << sourceText(FS->getCond()) << "\n";
-    std::cout << "    inc:  " << sourceText(FS->getInc()) << "\n";
-  }
-
-  for (Stmt *Child : S->children())
-    printForLoopPieces(Child);
+  return Lexer::getSourceText(Range, Context->getSourceManager(),
+                              Context->getLangOpts())
+      .str();
 }

@@ -1,3 +1,41 @@
+def traverse() {
+    largest_nested_tc = 1;
+    nested_tc = 1;
+    add function to visited
+    if stmt is loop
+        nested_tc = traverse(loop)
+        if nested_tc > largest_nested_tc:
+            largest_nested_tc = nestsed_tc;
+    elif stmt is function
+        if isRecursive:
+            ...
+        else
+            nested_tc = traverse(function)
+    elif stmt is declaration
+        ...
+
+    if traversing function:
+        if numrec == 1 {
+            if addrec != 0 {
+                tc = (log((cond-sval)/add)) * largest_nested_tc
+            } else {
+                tc = ((cond-sval)/add) * largest_nested_tc
+            }
+        } else {
+            tc = numrec^(h if addrec != 0 else logn if multrec != 0)
+        }
+
+        if traversing loop:
+            if (exp!=0 || mult != 0) {
+                tc = (log((cond-sval)/add)) * largest_nested_tc
+            } else {
+                tc = ((cond-sval)/add) * largest_nested_tc
+            }
+
+    return tc
+}
+
+
 //pseudo-code for TCC
 
 n0 = tc = calculated time complexity
@@ -49,7 +87,7 @@ loop_inc_num = the number of times the function increments
 
 
 TCC(measured_vars, start_line, end_line, visited_start_lines, loop_inc_num=1){
-    
+
     //Add current start_line to the list of visited lines
     visited_start_lines.append start_line
 

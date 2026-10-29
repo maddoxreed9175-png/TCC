@@ -1,5 +1,28 @@
 //pseudo-code for TCC
 
+n0 = tc = calculated time complexity
+
+n1 = sval = start value of tracked variable
+n2 = cond = conditional
+n3 = add = addition/subtraction operations on tracked variable
+n4 = mult = multiplication/division operations on tracked variable
+n5 = exp = exponents on tracked variable
+n6 = addrec = addition/subtraction inside recursive call
+n7 = multrec = multiplication/division inside recursive call
+n8 = numrec = number of recursive calls
+
+if (exp != 0 || mult != 0){
+    tc = log(cond-sval)/add;
+}else{
+    tc = (cond-sval)/add;
+}
+
+if (numrec == 1){
+    treat addrec like mult and exp
+}else{
+    tc = numrec^(largest tc out of all recursive calls)
+}
+
 /*
 Current Main Issues:
     Handling variable assignment
@@ -33,31 +56,30 @@ TCC(measured_vars, start_line, end_line, visited_start_lines, loop_inc_num=1){
     //Empty list, each element will be a component of the final time complexity
     complexity = {}
 
-    //This loops for each variable we want the time complexity of
-    for (int var=0; var<measured_vars.length(); var++){
 
-        //This loops through each line of the function
-        for (current_line = start_line+1; current_line<end_line; current_line++){
+    //This loops through each line of the function
+    for (current_line = start_line+1; current_line<end_line; current_line++){
 
-            if current_line starts function && includes var && current_line is not in visited_start_lines{
-                //This line checks to see if a nested function is recursive
-                if current_line is not in visited_start_lines {
-                    complexity.append TCC(measured_vars[var], current_line, new_end_line, 1)
-                }else{
-                    //If a nested function is recursive, we need to recalculate the current loop_inc_num
-                    //This should be done based on the change in the current var as it is passed in
-                    recalculate loop_inc_num
-                }
-            }elif current_line starts loop && includes var{
-                complexity.append TCC(measured_vars[var], current_line, new_end_line, calculate_loop_increment)
-                move current line to end of function
-            }elif current_line is assignment && includes var{
-                //This part is temporary, I'd like to talk to everyone about solutions
-                //loop_inc_num may need to be changed
-                //a constant C may need to be set
+        if current_line starts function {
+            //This line checks to see if a nested function is recursive
+            if current_line is not in visited_start_lines {
+                complexity.append TCC(measured_vars + new_vars, current_line, new_end_line, 1)
+            }else{
+                //If a nested function is recursive, we need to recalculate the current loop_inc_num
+                //This should be done based on the change in the current var as it is passed in
+                recalculate loop_inc_num
             }
+        }elif current_line starts loop{
+            complexity.append TCC(measured_vars + new_vars, current_line, new_end_line, calculate_loop_increment)
+            move current line to end of function
+        }elif current_line is assignment && includes measured_var{
+            //This part is temporary, I'd like to talk to everyone about solutions
+            //loop_inc_num may need to be changed
+            //a constant C may need to be set
         }
     }
+
+    loop_inc_num + "*" + largest complexity[i]
 
     //This will most likely output a string
     //ex. if complexity[i] == n and loop_inc_num == n, loop_inc_num*complexity[i] = n*n

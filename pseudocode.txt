@@ -25,12 +25,12 @@ def traverse() {
             tc = numrec^(h if addrec != 0 else logn if multrec != 0)
         }
 
-        if traversing loop:
-            if (exp!=0 || mult != 0) {
-                tc = (log((cond-sval)/add)) * largest_nested_tc
-            } else {
-                tc = ((cond-sval)/add) * largest_nested_tc
-            }
+    if traversing loop:
+        if (exp!=0 || mult != 0) {
+            tc = (log((cond-sval)/add)) * largest_nested_tc
+        } else {
+            tc = ((cond-sval)/add) * largest_nested_tc
+        }
 
     return tc
 }

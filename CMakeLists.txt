@@ -9,6 +9,7 @@ add_executable(tcc
     src/ASTWalker.cpp
     src/TCCASTConsumer.cpp
     src/TCC.cpp
+    src/Report.cpp
 )
 
 target_include_directories(tcc PRIVATE

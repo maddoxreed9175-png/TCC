@@ -35,9 +35,6 @@ def traverse() {
     return tc
 }
 
-
-//pseudo-code for TCC
-
 n0 = tc = calculated time complexity
 
 n1 = sval = start value of tracked variable
@@ -48,85 +45,3 @@ n5 = exp = exponents on tracked variable
 n6 = addrec = addition/subtraction inside recursive call
 n7 = multrec = multiplication/division inside recursive call
 n8 = numrec = number of recursive calls
-
-if (exp != 0 || mult != 0){
-    tc = log(cond-sval)/add;
-}else{
-    tc = (cond-sval)/add;
-}
-
-if (numrec == 1){
-    treat addrec like mult and exp
-}else{
-    tc = numrec^(largest tc out of all recursive calls)
-}
-
-/*
-Current Main Issues:
-    Handling variable assignment
-    Cases we need solutions for:
-    - When a number is assigned to a measured variable
-    - When a measured variable is changed using an operator
-    - When a measured variable is used in the assignment of a different variable
-*/
-
-/*
-measured_vars = list of all variables that are inputs passed into the function
-start_line = the line number of the first line of the function (function declaration)
-end_line = the line number of the last line of the function (closing bracket)
-visited_start_lines = list of all functions visited based on line number
-    This allows us to detect recursive functions
-loop_inc_num = the number of times the function increments
-    eg. for(int i=0; i < 10; i++){} would have a loop_inc_num of 10
-    Note: For basic functions, loop_inc_num is 1 because the function only runs once
-*/
-
-//NOTE: We have a very basic idea of how to deal with recursion that needs to be refined
-//NOTE: For this function to work, each sub function can only return 1 variable.
-      //This currently works, but we need to make sure subfunctions always return 1 variable
-
-
-TCC(measured_vars, start_line, end_line, visited_start_lines, loop_inc_num=1){
-
-    //Add current start_line to the list of visited lines
-    visited_start_lines.append start_line
-
-    //Empty list, each element will be a component of the final time complexity
-    complexity = {}
-
-
-    //This loops through each line of the function
-    for (current_line = start_line+1; current_line<end_line; current_line++){
-
-        if current_line starts function {
-            //This line checks to see if a nested function is recursive
-            if current_line is not in visited_start_lines {
-                complexity.append TCC(measured_vars + new_vars, current_line, new_end_line, 1)
-            }else{
-                //If a nested function is recursive, we need to recalculate the current loop_inc_num
-                //This should be done based on the change in the current var as it is passed in
-                recalculate loop_inc_num
-            }
-        }elif current_line starts loop{
-            complexity.append TCC(measured_vars + new_vars, current_line, new_end_line, calculate_loop_increment)
-            move current line to end of function
-        }elif current_line is assignment && includes measured_var{
-            //This part is temporary, I'd like to talk to everyone about solutions
-            //loop_inc_num may need to be changed
-            //a constant C may need to be set
-        }
-    }
-
-    loop_inc_num + "*" + largest complexity[i]
-
-    //This will most likely output a string
-    //ex. if complexity[i] == n and loop_inc_num == n, loop_inc_num*complexity[i] = n*n
-    if measured_vars.length() <= 1 {
-        return loop_inc_num + "*" + complexity[i]
-    }else{
-        for (int i=0; i<complexity.length(); i++){
-            std::cout << loop_inc_num*complexity[i] << std::endl;
-        }
-        return 0;
-    }
-}
